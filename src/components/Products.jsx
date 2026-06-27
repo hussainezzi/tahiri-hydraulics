@@ -1,7 +1,15 @@
 import { useState, useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { categories } from '../data/products';
-import { ChevronRight, Package, Tag } from 'lucide-react';
+import { ChevronRight, Wrench, Settings, Factory, Wind, Trophy } from 'lucide-react';
+
+const iconMap = {
+  wrench: <Wrench size={20} />,
+  settings: <Settings size={20} />,
+  factory: <Factory size={20} />,
+  wind: <Wind size={20} />,
+  trophy: <Trophy size={20} />,
+};
 
 function ProductCard({ product, index }) {
   const [hovered, setHovered] = useState(false);
@@ -93,7 +101,7 @@ export default function Products() {
                 key={c.id}
                 onClick={() => setActive(i)}
                 style={{
-                  width: '100%', textAlign: 'left', padding: '16px 20px',
+                  width: '100%', textAlign: 'left', padding: '14px 20px', minHeight: 56,
                   background: active === i ? 'rgba(204,0,0,0.12)' : 'transparent',
                   border: 'none', borderLeft: `3px solid ${active === i ? 'var(--red)' : 'transparent'}`,
                   borderRadius: active === i ? '0 12px 12px 0' : 0,
@@ -102,7 +110,7 @@ export default function Products() {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontSize: 20 }}>{c.icon}</span>
+                  <span style={{ color: active === i ? 'var(--red)' : 'rgba(255,255,255,0.4)', transition: 'color 0.3s' }}>{iconMap[c.icon]}</span>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 600, color: active === i ? '#fff' : 'rgba(255,255,255,0.5)', transition: 'color 0.3s' }}>{c.name}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{c.products.length} products</div>
@@ -130,7 +138,7 @@ export default function Products() {
                 >
                   <div style={{ marginBottom: 24 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                      <span style={{ fontSize: 28 }}>{cat.icon}</span>
+                      <span style={{ color: 'var(--red)' }}>{iconMap[cat.icon]}</span>
                       <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: 24, fontWeight: 700, color: '#fff' }}>{cat.name}</h3>
                     </div>
                     <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>{cat.description}</p>

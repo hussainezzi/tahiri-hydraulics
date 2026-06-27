@@ -2,10 +2,13 @@ import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
+// Skill: respect prefers-reduced-motion — pause all 3D animation
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function RotatingTorus({ position, speed = 1, color = '#CC0000', radius = 0.8, tube = 0.06 }) {
   const mesh = useRef();
   useFrame((state) => {
-    if (!mesh.current) return;
+    if (!mesh.current || prefersReducedMotion) return;
     mesh.current.rotation.x = Math.sin(state.clock.elapsedTime * speed * 0.5) * 0.5;
     mesh.current.rotation.y += 0.012 * speed;
     mesh.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * speed * 0.3) * 0.3;
@@ -21,7 +24,7 @@ function RotatingTorus({ position, speed = 1, color = '#CC0000', radius = 0.8, t
 function RotatingPipe({ position, rotation, color = '#CC0000' }) {
   const mesh = useRef();
   useFrame(() => {
-    if (!mesh.current) return;
+    if (!mesh.current || prefersReducedMotion) return;
     mesh.current.rotation.x += 0.004;
     mesh.current.rotation.y += 0.006;
   });
@@ -36,7 +39,7 @@ function RotatingPipe({ position, rotation, color = '#CC0000' }) {
 function FloatingSphere({ position }) {
   const mesh = useRef();
   useFrame((state) => {
-    if (!mesh.current) return;
+    if (!mesh.current || prefersReducedMotion) return;
     mesh.current.rotation.x = state.clock.elapsedTime * 0.2;
     mesh.current.rotation.y = state.clock.elapsedTime * 0.3;
     mesh.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.4) * 0.15;
@@ -57,7 +60,7 @@ function FloatingSphere({ position }) {
 function WireframeSphere() {
   const mesh = useRef();
   useFrame((state) => {
-    if (!mesh.current) return;
+    if (!mesh.current || prefersReducedMotion) return;
     mesh.current.rotation.x = state.clock.elapsedTime * 0.1;
     mesh.current.rotation.y = state.clock.elapsedTime * 0.15;
   });
@@ -96,7 +99,7 @@ function Particles() {
   }, [positions, colors]);
 
   useFrame((state) => {
-    if (!points.current) return;
+    if (!points.current || prefersReducedMotion) return;
     points.current.rotation.y = state.clock.elapsedTime * 0.018;
     points.current.rotation.x = state.clock.elapsedTime * 0.006;
   });
@@ -111,7 +114,7 @@ function Particles() {
 function SmallBox({ position, speed }) {
   const mesh = useRef();
   useFrame(() => {
-    if (!mesh.current) return;
+    if (!mesh.current || prefersReducedMotion) return;
     mesh.current.rotation.x += 0.01 * speed;
     mesh.current.rotation.z += 0.008 * speed;
   });
@@ -128,8 +131,10 @@ export default function HeroScene() {
     <Canvas
       camera={{ position: [0, 0, 8], fov: 60 }}
       style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-      gl={{ antialias: true, alpha: true }}
+      gl={{ antialias: true, alpha: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
     >
+      {/* Skill: FogExp2 for depth and far culling */}
+      <fogExp2 attach="fog" color="#0a0a0a" density={0.025} />
       <ambientLight intensity={0.4} />
       <pointLight position={[10, 10, 10]} intensity={2} color="#ffffff" />
       <pointLight position={[-8, -8, -8]} intensity={1} color="#CC0000" />

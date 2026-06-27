@@ -33,3 +33,24 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--black); }
 ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 2px; }
+
+/* Accessibility: respect reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Skill: cursor-pointer on all clickable elements */
+button, a, [role="button"] { cursor: pointer; }
+
+/* Skill: focus states visible for keyboard nav */
+:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+/* Skill: smooth scroll on html */
+html { scroll-behavior: smooth; }

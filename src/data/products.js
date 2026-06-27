@@ -2,7 +2,7 @@ export const categories = [
   {
     id: 'hydraulic-hoses',
     name: 'Hydraulic Hoses',
-    icon: '🔧',
+    icon: 'wrench',
     description: 'High-pressure hydraulic hoses for industrial applications',
     products: [
       { name: 'Parker Hydraulic Hose', sku: 'PRK-HH-001', brand: 'Parker', pressure: '350 Bar', temp: '-40°C to +100°C' },
@@ -15,7 +15,7 @@ export const categories = [
   {
     id: 'fittings',
     name: 'Hydraulic Fittings',
-    icon: '⚙️',
+    icon: 'settings',
     description: 'Precision crimping fittings and connectors',
     products: [
       { name: 'Hydraulic Crimping Fitting', sku: 'HCF-001', brand: 'Tahiri', material: 'Steel', type: 'BSP/NPT' },
@@ -27,7 +27,7 @@ export const categories = [
   {
     id: 'industrial-pipes',
     name: 'Industrial Pipes',
-    icon: '🏭',
+    icon: 'factory',
     description: 'MS, SS and specialty pipes for heavy industry',
     products: [
       { name: 'MS Brake Pipe', sku: 'MS-BP-001', brand: 'Tahiri', material: 'Mild Steel', pressure: '100 Bar' },
@@ -39,7 +39,7 @@ export const categories = [
   {
     id: 'bellows',
     name: 'Expansion Bellows',
-    icon: '🌀',
+    icon: 'wind',
     description: 'SS expansion and exhaust bellows for thermal compensation',
     products: [
       { name: 'SS Expansion Bellow', sku: 'SS-EB-001', brand: 'Tahiri', material: 'Stainless Steel 304', temp: 'up to +800°C' },
@@ -50,7 +50,7 @@ export const categories = [
   {
     id: 'authorized',
     name: 'Authorized Brands',
-    icon: '🏆',
+    icon: 'trophy',
     description: 'Official dealers for world-class hydraulic brands',
     products: [
       { name: 'Parker Full Hose Range', sku: 'PRK-FULL', brand: 'Parker', authorized: true },
