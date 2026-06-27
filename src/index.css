@@ -1,0 +1,33 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #CC0000;
+  --red-dark: #990000;
+  --red-light: #FF1A1A;
+  --white: #ffffff;
+  --black: #0a0a0a;
+  --gray-dark: #111111;
+  --gray-mid: #1a1a1a;
+  --gray-light: #2a2a2a;
+  --text-muted: #888888;
+  --font-main: 'Inter', sans-serif;
+  --font-heading: 'Rajdhani', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-main);
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--black); }
+::-webkit-scrollbar-thumb { background: var(--red); border-radius: 2px; }
