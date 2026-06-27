@@ -14,7 +14,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section id="home" style={{ position: 'relative', height: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: 'var(--black)' }}>
+    <section id="home" style={{ position: 'relative', width: '100%', height: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: 'var(--black)' }}>
       {/* 3D Canvas Background */}
       <HeroScene />
 

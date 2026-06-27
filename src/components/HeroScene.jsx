@@ -1,95 +1,125 @@
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Torus, Sphere, Box, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
-function Pipe({ position, rotation, color = '#CC0000', radius = 0.08, length = 3 }) {
+function RotatingTorus({ position, speed = 1, color = '#CC0000', radius = 0.8, tube = 0.06 }) {
   const mesh = useRef();
   useFrame((state) => {
-    if (mesh.current) {
-      mesh.current.rotation.x += 0.003;
-      mesh.current.rotation.y += 0.005;
-    }
+    if (!mesh.current) return;
+    mesh.current.rotation.x = Math.sin(state.clock.elapsedTime * speed * 0.5) * 0.5;
+    mesh.current.rotation.y += 0.012 * speed;
+    mesh.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * speed * 0.3) * 0.3;
   });
   return (
-    <mesh ref={mesh} position={position} rotation={rotation}>
-      <cylinderGeometry args={[radius, radius, length, 16]} />
-      <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />
+    <mesh ref={mesh} position={position}>
+      <torusGeometry args={[radius, tube, 16, 60]} />
+      <meshStandardMaterial color={color} metalness={0.9} roughness={0.1} />
     </mesh>
   );
 }
 
-function FloatingRing({ position, speed = 1, color = '#CC0000' }) {
+function RotatingPipe({ position, rotation, color = '#CC0000' }) {
   const mesh = useRef();
-  useFrame((state) => {
-    if (mesh.current) {
-      mesh.current.rotation.x = Math.sin(state.clock.elapsedTime * speed * 0.5) * 0.5;
-      mesh.current.rotation.y += 0.01 * speed;
-      mesh.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * speed * 0.3) * 0.2;
-    }
+  useFrame(() => {
+    if (!mesh.current) return;
+    mesh.current.rotation.x += 0.004;
+    mesh.current.rotation.y += 0.006;
   });
   return (
-    <Torus ref={mesh} args={[0.8, 0.06, 16, 60]} position={position}>
-      <meshStandardMaterial color={color} metalness={0.9} roughness={0.1} />
-    </Torus>
+    <mesh ref={mesh} position={position} rotation={rotation}>
+      <cylinderGeometry args={[0.07, 0.07, 3, 16]} />
+      <meshStandardMaterial color={color} metalness={0.85} roughness={0.15} />
+    </mesh>
   );
 }
 
-function GearShape({ position, speed = 1 }) {
+function FloatingSphere({ position }) {
   const mesh = useRef();
   useFrame((state) => {
-    if (mesh.current) {
-      mesh.current.rotation.z += 0.008 * speed;
-    }
+    if (!mesh.current) return;
+    mesh.current.rotation.x = state.clock.elapsedTime * 0.2;
+    mesh.current.rotation.y = state.clock.elapsedTime * 0.3;
+    mesh.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.4) * 0.15;
   });
   return (
-    <Box ref={mesh} args={[0.4, 0.4, 0.1]} position={position}>
-      <meshStandardMaterial color="#CC0000" metalness={0.95} roughness={0.05} />
-    </Box>
+    <mesh ref={mesh} position={position}>
+      <sphereGeometry args={[1.2, 64, 64]} />
+      <meshStandardMaterial
+        color="#CC0000"
+        metalness={0.9}
+        roughness={0.1}
+        wireframe={false}
+      />
+    </mesh>
   );
 }
 
-function ParticleField() {
+function WireframeSphere() {
+  const mesh = useRef();
+  useFrame((state) => {
+    if (!mesh.current) return;
+    mesh.current.rotation.x = state.clock.elapsedTime * 0.1;
+    mesh.current.rotation.y = state.clock.elapsedTime * 0.15;
+  });
+  return (
+    <mesh ref={mesh}>
+      <sphereGeometry args={[1.6, 24, 24]} />
+      <meshStandardMaterial color="#FF2200" metalness={0.5} roughness={0.5} wireframe />
+    </mesh>
+  );
+}
+
+function Particles() {
   const points = useRef();
-  const count = 200;
-  const positions = useMemo(() => {
+  const count = 300;
+
+  const [positions, colors] = useMemo(() => {
     const pos = new Float32Array(count * 3);
+    const col = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 20;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+      pos[i * 3]     = (Math.random() - 0.5) * 22;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 22;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 12;
+      const t = Math.random();
+      col[i * 3]     = 0.7 + t * 0.3;  // R
+      col[i * 3 + 1] = 0;               // G
+      col[i * 3 + 2] = 0;               // B
     }
-    return pos;
+    return [pos, col];
   }, []);
 
+  const geo = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    return g;
+  }, [positions, colors]);
+
   useFrame((state) => {
-    if (points.current) {
-      points.current.rotation.y = state.clock.elapsedTime * 0.02;
-    }
+    if (!points.current) return;
+    points.current.rotation.y = state.clock.elapsedTime * 0.018;
+    points.current.rotation.x = state.clock.elapsedTime * 0.006;
   });
 
   return (
-    <points ref={points}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
-      </bufferGeometry>
-      <pointsMaterial color="#CC0000" size={0.04} transparent opacity={0.6} />
+    <points ref={points} geometry={geo}>
+      <pointsMaterial size={0.05} vertexColors transparent opacity={0.7} />
     </points>
   );
 }
 
-function CentralSphere() {
+function SmallBox({ position, speed }) {
   const mesh = useRef();
-  useFrame((state) => {
-    if (mesh.current) {
-      mesh.current.rotation.x = state.clock.elapsedTime * 0.2;
-      mesh.current.rotation.y = state.clock.elapsedTime * 0.3;
-    }
+  useFrame(() => {
+    if (!mesh.current) return;
+    mesh.current.rotation.x += 0.01 * speed;
+    mesh.current.rotation.z += 0.008 * speed;
   });
   return (
-    <Sphere ref={mesh} args={[1.2, 64, 64]} position={[0, 0, 0]}>
-      <MeshDistortMaterial color="#CC0000" metalness={0.9} roughness={0.1} distort={0.3} speed={2} />
-    </Sphere>
+    <mesh ref={mesh} position={position}>
+      <boxGeometry args={[0.4, 0.4, 0.4]} />
+      <meshStandardMaterial color="#CC0000" metalness={0.95} roughness={0.05} />
+    </mesh>
   );
 }
 
@@ -97,28 +127,31 @@ export default function HeroScene() {
   return (
     <Canvas
       camera={{ position: [0, 0, 8], fov: 60 }}
-      style={{ position: 'absolute', inset: 0 }}
+      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
       gl={{ antialias: true, alpha: true }}
     >
-      <ambientLight intensity={0.3} />
-      <pointLight position={[10, 10, 10]} intensity={1} color="#ffffff" />
-      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#CC0000" />
-      <spotLight position={[0, 10, 0]} intensity={1} color="#CC0000" angle={0.3} />
+      <ambientLight intensity={0.4} />
+      <pointLight position={[10, 10, 10]} intensity={2} color="#ffffff" />
+      <pointLight position={[-8, -8, -8]} intensity={1} color="#CC0000" />
+      <pointLight position={[0, 5, 5]} intensity={1.5} color="#FF3300" />
 
-      <CentralSphere />
-      <ParticleField />
+      <FloatingSphere position={[0, 0, 0]} />
+      <WireframeSphere />
+      <Particles />
 
-      <FloatingRing position={[-3, 1, -2]} speed={0.8} color="#CC0000" />
-      <FloatingRing position={[3, -1, -1]} speed={1.2} color="#FF3333" />
-      <FloatingRing position={[0, 2.5, -3]} speed={0.6} color="#990000" />
+      <RotatingTorus position={[-3.5, 1, -2]} speed={0.7} color="#CC0000" radius={1} tube={0.07} />
+      <RotatingTorus position={[3.5, -1, -1]} speed={1.1} color="#FF2200" radius={0.7} tube={0.06} />
+      <RotatingTorus position={[0.5, 2.8, -3]} speed={0.5} color="#990000" radius={0.9} tube={0.05} />
+      <RotatingTorus position={[-2, -2.5, -1]} speed={0.9} color="#FF4400" radius={0.6} tube={0.05} />
 
-      <Pipe position={[-2.5, 0, 0]} rotation={[0, 0, Math.PI / 4]} color="#CC0000" />
-      <Pipe position={[2.5, 0, 0]} rotation={[0, 0, -Math.PI / 4]} color="#FF1A1A" />
-      <Pipe position={[0, -2, -1]} rotation={[Math.PI / 6, 0, 0]} color="#990000" />
+      <RotatingPipe position={[-2.8, 0.5, -1]} rotation={[0, 0, Math.PI / 4]} color="#CC0000" />
+      <RotatingPipe position={[2.8, -0.5, -1]} rotation={[0, 0, -Math.PI / 4]} color="#FF1A1A" />
+      <RotatingPipe position={[0.5, -2.5, 0]} rotation={[Math.PI / 5, 0.3, 0]} color="#AA0000" />
 
-      <GearShape position={[-4, 2, -2]} speed={1} />
-      <GearShape position={[4, -2, -2]} speed={-0.8} />
-      <GearShape position={[-1, -3, 0]} speed={1.5} />
+      <SmallBox position={[-4.5, 2, -2]} speed={1} />
+      <SmallBox position={[4.5, -2, -2]} speed={-0.8} />
+      <SmallBox position={[-1.5, -3.5, 0]} speed={1.3} />
+      <SmallBox position={[3, 3, -3]} speed={0.7} />
     </Canvas>
   );
 }
